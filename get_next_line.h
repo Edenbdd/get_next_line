@@ -28,7 +28,8 @@ int	ft_strlen(char *str);
 char	*ft_strdup(char *s);
 char	*ft_strchr(char *s, int c);
 char	*ft_strjoin(char *s1,char *s2);
-
 char    *get_next_line(int fd);
+
+void    *ft_calloc(size_t nmemb, size_t size);
 
 #endif

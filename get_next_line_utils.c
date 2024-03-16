@@ -81,3 +81,24 @@ char	*ft_strjoin(char *s1,char *s2)
 	str[i] = '\0';
 	return (str);
 }
+
+void	*ft_calloc(size_t nmemb, size_t size)
+{
+	size_t			i;
+	unsigned char	*ptr;
+
+	i = 0;
+	if (size == 0 || nmemb == 0)
+		return (malloc(0));
+	if ((size * nmemb) < size || (size * nmemb) < nmemb)
+		return (NULL);
+	ptr = malloc(size * nmemb);
+	if (!ptr)
+		return (NULL);
+	while (i < nmemb * size)
+	{
+		ptr[i] = 0;
+		i++;
+	}
+	return (ptr);
+}

@@ -27,13 +27,12 @@ char    *get_next_line(int fd)
 		left_char = "";
 	if (fd <= 0)
         	return (NULL);
-	buffer = malloc(BUFFER_SIZE + 1);
+	buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
 	temp = find_line(fd, buffer);
 	if (!temp)
 		return (NULL);
-	free(buffer);
 	filled_line = fill_line(temp, left_char);
 	left_char= get_left_char(temp);
 	free(temp);
@@ -43,17 +42,24 @@ char    *get_next_line(int fd)
 static char    *find_line(int fd, char *buffer)
 {
 	char	*temp;
+	int	val_read;
+	char	*to_free;
 
-	temp = "";
+	temp = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	while (!ft_strchr(temp, 10))
 	{
-		if (read(fd, buffer, BUFFER_SIZE) <= 0)
+		val_read = read(fd, buffer, BUFFER_SIZE);
+		if (val_read <= 0)
 		{
 			free(buffer);
 			return (NULL);
 		}
+		buffer[val_read] = '\0';
+		to_free = temp;
 		temp = ft_strjoin(temp, buffer);
+		free (to_free);
 	}
+	free(buffer);
 	return (temp);
 }
 
@@ -61,9 +67,10 @@ static char	*fill_line(char	*temp, char *left_char)
 {
 	char	*filled_line;
 	int	i;
+	char	*to_free;
 
 	i = 0;
-	filled_line = malloc(ft_strlen(temp) + 1);
+	filled_line = ft_calloc(sizeof(char), ft_strlen(temp) + 1);
 	if (!filled_line)
 		return (NULL);
 	while (temp[i] != '\0' && temp[i] != '\n')
@@ -72,21 +79,26 @@ static char	*fill_line(char	*temp, char *left_char)
 		i++;
 	}
 	filled_line[i] = '\0';
-	filled_line = ft_strjoin(left_char, filled_line);	
+	to_free = filled_line;
+	filled_line = ft_strjoin(left_char, filled_line);
+	free(to_free);	
 	return (filled_line);
 }
 
 static char	*get_left_char(char *temp)
 {
 	char	*left_char;
-	
+	char	*to_free;
+
 	left_char = malloc(ft_strlen(temp) + 1);
 	if (!left_char)
 		return (NULL);
+	to_free = left_char;
 	if (ft_strchr(temp, '\n'))
 		left_char = ft_strdup(ft_strchr(temp, '\n'));
 	else
 		left_char = ft_strdup(ft_strchr(temp, '\0'));	
+	free(to_free);
 	return (left_char);
 }
 
