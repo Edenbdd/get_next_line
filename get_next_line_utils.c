@@ -12,7 +12,7 @@
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *str)
+int	ft_strlen(char *str)
 {
 	int	i;
 
@@ -22,31 +22,7 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*sub;
-	size_t	j;
-
-	if (!s)
-		return (NULL);
-	if (start > ft_strlen(s) || len == 0)
-		return (ft_calloc(1, sizeof(char)));
-	if (len > ft_strlen(s + start))
-		len = ft_strlen(s + start);
-	j = 0;
-	sub = ft_calloc(len + 1, sizeof(char));
-	if (!sub)
-		return (NULL);
-	while (j < len)
-	{
-		sub[j] = s[j + start];
-		j++;
-	}
-	sub[j] = '\0';
-	return (sub);
-}
-
-char	*ft_strchr(const char *s, int c)
+char	*ft_strchr(char *s, int c)
 {
 	int	len;
 	int	i;
@@ -56,13 +32,13 @@ char	*ft_strchr(const char *s, int c)
 	while (i < len)
 	{
 		if (s[i] == (char)c)
-			return ((char *)s + i);
+			return ((char *)s + i + 1);
 		i++;
 	}
 	return (NULL);
 }
 
-char	*ft_strdup(const char *s)
+char	*ft_strdup(char *s)
 {
 	int		i;
 	char	*tmp;
@@ -80,7 +56,7 @@ char	*ft_strdup(const char *s)
 	return (tmp);
 }
 
-char	*ft_strjoin(const char *s1, const char *s2)
+char	*ft_strjoin(char *s1,char *s2)
 {
 	char	*str;
 	int		i;
@@ -102,6 +78,6 @@ char	*ft_strjoin(const char *s1, const char *s2)
 		j++;
 		i++;
 	}
-	str[i] = 0;
+	str[i] = '\0';
 	return (str);
 }

@@ -10,19 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef GET_NEXT_LINE_H
+#define GET_NEXT_LINE
+
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 4
+#endif
+
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-size_t	ft_strlen(const char *str);
+int	ft_strlen(char *str);
 
-char	*ft_strdup(const char *s);
-char	*ft_strchr(const char *s, int c);
-char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*ft_strjoin(const char *s1, const char *s2);
+char	*ft_strdup(char *s);
+char	*ft_strchr(char *s, int c);
+char	*ft_strjoin(char *s1,char *s2);
 
-char    *get_left_char(char *line_buffer);
-char    *fill_buffer(int fd, char *left_char, char *buffer);
 char    *get_next_line(int fd);
+
+#endif
