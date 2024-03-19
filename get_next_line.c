@@ -22,9 +22,8 @@ char    *get_next_line(int fd)
 	static char	*left_char;
 	char	*filled_line;
 	char	*temp;
+	char	*to_free;
 
-	if (!left_char)
-		left_char = "";
 	if (fd <= 0)
         	return (NULL);
 	buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
@@ -33,7 +32,13 @@ char    *get_next_line(int fd)
 	temp = find_line(fd, buffer);
 	if (!temp)
 		return (NULL);
+	if (!left_char)
+		left_char =ft_calloc(sizeof(char), ft_strlen(temp) + 1);
+	if(!left_char)
+		return (NULL);
 	filled_line = fill_line(temp, left_char);
+	to_free = left_char;
+	free(to_free);
 	left_char= get_left_char(temp);
 	free(temp);
 	return (filled_line);
@@ -90,7 +95,7 @@ static char	*get_left_char(char *temp)
 	char	*left_char;
 	char	*to_free;
 
-	left_char = malloc(ft_strlen(temp) + 1);
+	left_char = ft_calloc(sizeof(char), ft_strlen(temp) + 1);
 	if (!left_char)
 		return (NULL);
 	to_free = left_char;
