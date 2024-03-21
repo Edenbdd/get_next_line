@@ -31,9 +31,17 @@ char    *get_next_line(int fd)
 		return (NULL);
 	temp = find_line(fd, buffer);
 	if (!temp)
-		return (free(left_char), NULL);
-	if (!temp[0])
+	{
+		free (left_char);
+		left_char = NULL;
 		return (left_char);
+	}
+	if (!temp[0])
+	{
+		temp = left_char;
+		left_char = NULL;
+		return (temp);
+	}
 	if (!left_char)
 		left_char = ft_calloc(sizeof(char), ft_strlen(temp) + 1);
 	if(!left_char)
@@ -54,7 +62,7 @@ static char    *find_line(int fd, char *buffer)
 	temp = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if(!temp)
 		return (free(buffer), NULL);
-	while (!ft_strchr(temp, 10))
+	while (!ft_strchr(temp, '\n'))
 	{
 		val_read = read(fd, buffer, BUFFER_SIZE);
 		if (val_read <= 0)
@@ -112,17 +120,16 @@ static char	*get_left_char(char *temp)
 	return (left_char);
 }
 
-
 int main(void)
 {
 	int	fd;
 	char	*str;
 
-	fd = open("test.txt", O_RDONLY);
+	fd = open("test", O_RDONLY);
 	for (int i = 0; i < 3; i++) 
 	{
 		str = get_next_line(fd);
-		printf("%s", str);
+		printf("%s\n", str);
 		free(str);
 	}
 	close(fd);
