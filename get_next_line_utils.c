@@ -79,6 +79,7 @@ char	*ft_strjoin(char *s1,char *s2)
 		i++;
 	}
 	str[i] = '\0';
+	free(s1);
 	return (str);
 }
 
@@ -94,7 +95,7 @@ void	*ft_calloc(size_t nmemb, size_t size)
 		return (NULL);
 	ptr = malloc(size * nmemb);
 	if (!ptr)
-		return (NULL);
+		return (free(ptr), NULL);
 	while (i < nmemb * size)
 	{
 		ptr[i] = 0;

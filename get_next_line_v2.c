@@ -1,138 +1,106 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: aubertra <aubertra@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/14 10:35:44 by aubertra          #+#    #+#             */
-/*   Updated: 2024/03/14 11:42:40 by aubertra         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+/*include header*/
 
 #include "get_next_line.h"
 
-static char    *find_line(int fd, char *buffer);
-static char     *fill_line(char *temp, char *left_char);
-static char     *get_left_char(char *temp);
+static char     *filled_line(int fd, char *buffer, char *line);
+static char     *adjust_line(char *line);
+static char    *left_char(char *line);
 
-char    *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
+	static char	*line;
 	char		*buffer;
-	static char	*left_char;
-	char	*filled_line;
-	char	*temp;
-	char	*to_free;
+	char		*adjusted_line;
 
-	if (fd <= 0 || BUFFER_SIZE <= 0)
-        	return (NULL);
+	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0)
+		return (NULL);
 	buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
-	temp = find_line(fd, buffer);
-	if (!temp)
-	{
-		free (left_char);
-		left_char = NULL;
-		return (left_char);
-	}
-	if (!temp[0])
-	{
-		temp = left_char;
-		left_char = NULL;
-		return (temp);
-	}
-	if (!left_char)
-		left_char = ft_calloc(sizeof(char), ft_strlen(temp) + 1);
-	if(!left_char)
-		return (NULL);
-	filled_line = fill_line(temp, left_char);
-	to_free = left_char;
-	free(to_free);
-	left_char= get_left_char(temp);
-	return (filled_line);
+	if (!line)
+		line = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
+	if (!line)
+		return(free(buffer), NULL);
+	line = filled_line(fd, buffer, line);
+	adjusted_line = adjust_line(line);
+	line = left_char(line);
+	return (adjusted_line);
 }
 
-static char    *find_line(int fd, char *buffer)
+char	*filled_line(int fd, char *buffer, char *line)
 {
-	char	*temp;
-	int	val_read;
-	char	*to_free;
+	int		val_read;
 
-	temp = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
-	if(!temp)
-		return (free(buffer), NULL);
-	while (!ft_strchr(temp, '\n'))
+	val_read = 1;
+	while (val_read > 0)
 	{
 		val_read = read(fd, buffer, BUFFER_SIZE);
-		if (val_read <= 0)
-			return (free(buffer), free(temp), NULL);
+		if (val_read == -1)
+			return (free(buffer), NULL);
+		if (val_read == 0)
+			return (NULL);
 		buffer[val_read] = '\0';
-		to_free = temp;
-		temp = ft_strjoin(temp, buffer);
-		free(to_free);
+		line = ft_strjoin(line, buffer);
+		if (!line)
+			return (free(buffer), NULL);
+		if (ft_strchr(buffer, '\n'))
+				break;
 	}
-	free(buffer);
+	return (free(buffer), line);
+}
+char	*adjust_line(char *line)
+{
+	int		i;
+	int		j;
+	char	*temp;
+
+	i = 0;
+	j = 0;
+
+	if (!line || !line[0])
+		return (NULL);
+	while (line[i] && line[i] != '\n')
+		i++;
+	temp = ft_calloc(sizeof(char), (i + 2));
+	if (!temp)
+		return (NULL);
+	while (j <= i)
+	{
+		temp[j] = line[j];
+		j++;
+	}
+	temp[j] = '\0';
 	return (temp);
 }
 
-static char	*fill_line(char	*temp, char *left_char)
+static char    *left_char(char *line)
 {
-	char	*filled_line;
-	int	i;
-	char	*to_free;
-
-	i = 0;
-	filled_line = ft_calloc(sizeof(char), ft_strlen(temp) + 1);
-	if (!filled_line)
-		return (NULL);
-	while (temp[i] != '\0' && temp[i] != '\n')
-	{
-		filled_line[i] = temp[i];
-		i++;
-	}
-	if (temp[i] == '\n')
-		filled_line[i] = '\n';
-	filled_line[i + 1] = '\0';
-	to_free = filled_line;
-	filled_line = ft_strjoin(left_char, filled_line);
-	free(to_free);	
-	return (filled_line);
-}
-
-static char	*get_left_char(char *temp)
-{
-	char	*left_char;
-	char	*to_free;
+        char    *temp;
 	char	*from_n;
-	
-	from_n = ft_strchr(temp, '\n');
-	left_char = ft_calloc(sizeof(char), ft_strlen(temp) + 1);
-	if (!left_char)
-		return (free(temp), NULL);
-	to_free = left_char;
-	if (from_n)
-		left_char = ft_strdup(from_n);
-	else
-		left_char = ft_strdup(temp);
-	free(to_free);
-	free(temp);
-	return (left_char);
-}
 
+        if (!line)
+                return (free(line), NULL);
+	from_n = ft_strchr(line, '\n');
+	if (from_n)
+		temp = ft_strdup(from_n);
+	else
+		temp = ft_strdup(line);
+	return (free(line), temp);
+}
+/*
 int main(void)
 {
 	int	fd;
 	char	*str;
 
 	fd = open("test", O_RDONLY);
-	for (int i = 0; i < 3; i++) 
+	for (int i = 0; i < 5; i++)
 	{
 		str = get_next_line(fd);
-		printf("%s\n", str);
+		printf("%s", str);
 		free(str);
 	}
 	close(fd);
 	return (0);
 }
-
+*/
