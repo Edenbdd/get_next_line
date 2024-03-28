@@ -22,7 +22,7 @@ char	*get_next_line(int fd)
 	char		*buffer;
 	char		*adjusted_line;
 
-	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 		return (NULL);
 	buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (!buffer)
@@ -30,10 +30,11 @@ char	*get_next_line(int fd)
 	if (!line)
 		line = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (!line)
-		return(free(buffer), NULL);
+		return (free(buffer), NULL);
 	line = filled_line(fd, buffer, line);
-	free(buffer);
 	adjusted_line = adjust_line(line);
+	if (!adjusted_line)
+		return (NULL);
 	line = left_char(line);
 	return (adjusted_line);
 }
@@ -43,19 +44,17 @@ char	*filled_line(int fd, char *buffer, char *line)
 	int		val_read;
 
 	val_read = 1;
-	while (val_read)
+	while (val_read && !ft_strchr(buffer, '\n'))
 	{
 		val_read = read(fd, buffer, BUFFER_SIZE);
 		if (val_read == -1)
-			return (free(buffer), NULL);
+			return (free(buffer), free(line), NULL);
 		if (val_read == 0)
 			break;
 		buffer[val_read] = '\0';
 		line = ft_strjoin(line, buffer);
-		if (!line)
-			return (free(buffer), NULL);
 	}
-	return (line);
+	return (free(buffer), line);
 }
 
 char	*adjust_line(char *line)
@@ -66,7 +65,6 @@ char	*adjust_line(char *line)
 
 	i = 0;
 	j = 0;
-
 	if (!line || !line[0])
 		return (NULL);
 	while (line[i] && line[i] != '\n')
@@ -87,8 +85,12 @@ char    *left_char(char *line)
 {
 	char    *temp;
 	char	*from_n;
+	int	i;
 
-	if (!line)
+	i = 0;
+	while(line[i] != '\n' && line[i] != '\0')
+		i++;
+	if (line[i] == '\0'  || line[1] == '\0')
 		return (free(line), NULL);
 	from_n = ft_strchr(line, '\n');
 	if (from_n)
@@ -98,17 +100,28 @@ char    *left_char(char *line)
 	return (free(line), temp);
 }
 
+/*	
 int main(void)
 {
 	int	fd;
 	char	*str;
+//	int	i;
 
-	fd = open("test.txt", O_RDONLY);
+//	i = 0;
+	fd = open("41_with_nl", O_RDONLY);
+	while (i < 6)
+	{
+		printf("%s",get_next_line(fd));
+		free(get_next_line(fd));
+		i++;
+	}
 	while ((str = get_next_line(fd))) {
 		printf("%s", str);
 		free(str);
 	}
 	close(fd);
 	return (0);
+
 }
+*/
 
