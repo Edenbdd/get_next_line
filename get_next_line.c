@@ -36,6 +36,11 @@ char	*get_next_line(int fd)
 	if (!adjusted_line)
 		return (NULL);
 	line = left_char(line);
+	if (!line[0]) 
+	{
+        	free(line);
+        	line = NULL;
+    	}
 	return (adjusted_line);
 }
 
