@@ -27,17 +27,17 @@ char	*get_next_line(int fd)
 	buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
-	if (!line)
-		line = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
-	if (!line)
-		return (free(buffer), NULL);
 	line = filled_line(fd, buffer, line);
 	adjusted_line = adjust_line(line);
 	if (!adjusted_line)
-		return (NULL);
-	line = left_char(line);
-	if (!line[0]) 
 	{
+		free(line);
+		line=NULL;
+		return (NULL);
+	}
+	line = left_char(line);
+	if (!line || !line[0])
+       	{
         	free(line);
         	line = NULL;
     	}
@@ -48,6 +48,10 @@ char	*filled_line(int fd, char *buffer, char *line)
 {
 	int		val_read;
 
+	if (!line)
+		line = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
+	if (!line)
+		return (free(buffer), NULL);
 	val_read = 1;
 	while (val_read && !ft_strchr(buffer, '\n'))
 	{
@@ -104,16 +108,16 @@ char    *left_char(char *line)
 		temp = ft_strdup(line);
 	return (free(line), temp);
 }
-
-/*	
+	
+/*
 int main(void)
 {
 	int	fd;
-	char	*str;
-//	int	i;
+//	char	*str;
+	int	i;
 
-//	i = 0;
-	fd = open("41_with_nl", O_RDONLY);
+	i = 0;
+	fd = open("test", O_RDONLY);
 	while (i < 6)
 	{
 		printf("%s",get_next_line(fd));
@@ -129,4 +133,5 @@ int main(void)
 
 }
 */
+
 
